@@ -1,0 +1,48 @@
+apiVersion: logstash.k8s.elastic.co/v1alpha1
+kind: Logstash
+metadata:
+  name: quickstart
+spec:
+  count: 1
+  elasticsearchRefs:
+    # This allows us to access multiple ES clusters
+    # in LS by loading their details as Env Vars
+    # within the container.
+    # EnvVars are prefixed with the Cluster name 
+    # specified below.
+    - name: quickstart
+      clusterName: qs
+  monitoring:
+      metrics:
+        elasticsearchRefs:
+        - name: quickstart
+      logs:
+        elasticsearchRefs:
+        - name: quickstart
+  version: 8.13.2
+  pipelines:
+    - pipeline.id: main
+      config.string: |
+        input {
+          beats {
+            port => 5044
+          }
+        }
+        output {
+          elasticsearch {
+            hosts => [ "${QS_ES_HOSTS}" ]
+            user => "${QS_ES_USER}"
+            password => "${QS_ES_PASSWORD}"
+            ssl_certificate_authorities => "${QS_ES_SSL_CERTIFICATE_AUTHORITY}"
+          }
+        }
+  services:
+    - name: beats
+      service:
+        spec:
+          type: NodePort
+          ports:
+            - port: 5044
+              name: "filebeat"
+              protocol: TCP
+              targetPort: 30044
