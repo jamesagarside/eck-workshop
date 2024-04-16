@@ -4,7 +4,7 @@
 https://www.elastic.co/guide/en/cloud-on-k8s/current/k8s-quickstart.html
 
 ## Getting Started - Quicktime
-`kubectl apply -f elastic-stack/*`
+`kubectl apply -f elastic-stack/`
 
 ## Getting Started - Step by Step
 ### Install ECK Operator
